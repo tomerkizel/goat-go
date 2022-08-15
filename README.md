@@ -17,7 +17,7 @@
 
 ### Import Goat
 
-go```
+```go
     import github.com/tomerkizel/goat
 ```
 
