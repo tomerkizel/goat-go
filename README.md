@@ -8,14 +8,14 @@
 ---
 
 
-# Table of Contents
-    - [Why Goat](#why-goat)
-    - [Import Goat](#import-goat)
+## Table of Contents
+ - [Why Goat](#why-goat)
+ - [Import Goat](#import-goat)
 
-## Why Goat?
+### Why Goat?
 
 
-## Import Goat
+### Import Goat
 
 go```
     import github.com/tomerkizel/goat
