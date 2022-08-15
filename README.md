@@ -2,9 +2,9 @@
   <img src="./Goat-logo.png" alt="Goat" title="Goat" height="300px" />
 </h1>
 
-<p align="center" font>
-:goat:Persistent Collection For The Go Language:goat:
-</p>
+<h2 align="center">
+:goat: Persistent Collection For The Go Language :goat:
+</h2>
 
 <h7 align="center"> This package was first written on <a href="https://github.com/jfrog/jfrog-client-go">JFrog client go</a></h3>
 
