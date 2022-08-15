@@ -16,7 +16,7 @@ Persistent Collection For The Go Language
     - [PersistentCollection](#persistentcollection)
     - [PersistentReader](#persistentreader)
     - [PersistentWriter](#persistentwriter)
-    
+
 ## Why Goat?
 Goat allows you to create a persistent collection, that reads and writes JSON files using small chunks of memory.
 The default chunk size is 50000 but it can be change, see [Using Goat](#using-goat)
@@ -44,12 +44,26 @@ type PersistentCollection struct {
 PersistentReader is used to read JSON files into small chunks of memory
 
 ```go
-
+type PersistentReader struct {
+	Empty       bool                `json:"empty"`
+	Length      int                 `json:"length"`
+	FilePath    string              `json:"filePath"`
+	JsonKey     string              `json:"jsonKey"`
+	DataChan    chan map[string]any `json:"dataChan"`
+	ErrorsQueue *ErrorsQueue        `json:"errorsQueue"`
+	Once        *sync.Once          `json:"once"`
+}
 ```
 
 ### PersistentWriter
 PersistentWriter is used to write JSON files from small chunks of memory
 
 ```go
-
+type PersistentWriter struct {
+	Empty       bool         `json:"empty"`
+	FilePath    string       `json:"filePath"`
+	DataChan    chan any     `json:"dataChan"`
+	ErrorsQueue *ErrorsQueue `json:"errorsQueue"`
+	Once        *sync.Once   `json:"once"`
+}
 ```
