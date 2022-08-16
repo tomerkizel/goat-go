@@ -1,20 +1,18 @@
 package pcollection
 
-import "os"
-
 type PersistentCollection struct {
 	MaxBufferSize    int               `json:"maxBufferSize"`
 	PersistentReader *PersistentReader `json:"persistentReader"`
 	PersistentWriter *PersistentWriter `json:"persistentWriter"`
 }
 
-func NewPersistentCollection(readfilepath string, writefilepath *os.File, readkey, writekey string) (*PersistentCollection, error) {
+func NewPersistentCollection(readfilepath string, writefullfile bool, readkey, writekey string) (*PersistentCollection, error) {
 	self := NewEmptyPersistentCollection()
 	err := self.SetReader(readkey, readfilepath)
 	if err != nil {
 		return nil, err
 	}
-	err = self.SetWriter(writekey, writefilepath)
+	err = self.SetWriter(writekey, writefullfile)
 	if err != nil {
 		return nil, err
 	}
@@ -33,9 +31,9 @@ func (p *PersistentCollection) SetReader(readkey, filepath string) error {
 	return err
 }
 
-func (p *PersistentCollection) SetWriter(jsonkey string, outputfile *os.File) error {
+func (p *PersistentCollection) SetWriter(jsonkey string, iscompletefile bool) error {
 	var err error
-	p.PersistentWriter, err = NewPersistentWriter(jsonkey, outputfile, p.MaxBufferSize)
+	p.PersistentWriter, err = NewPersistentWriter(jsonkey, iscompletefile, p.MaxBufferSize)
 	return err
 }
 

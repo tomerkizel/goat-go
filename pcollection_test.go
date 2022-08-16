@@ -37,7 +37,7 @@ func getTestDataPath() string {
 
 func TestPersistentCollectionConstructor(t *testing.T) {
 	readPath := filepath.Join(getTestDataPath(), searchResult)
-	pc, err := NewPersistentCollection(readPath, nil, defaultKey, "")
+	pc, err := NewPersistentCollection(readPath, false, defaultKey, "")
 	assert.Equal(t, err, nil)
 	assert.Equal(t, pc.GetBufferSize(), 50000)
 	assert.Equal(t, pc.GetReaderKey(), defaultKey)
@@ -45,7 +45,7 @@ func TestPersistentCollectionConstructor(t *testing.T) {
 
 func TestPersistentCollectionNextAndLength(t *testing.T) {
 	readPath := filepath.Join(getTestDataPath(), searchResult)
-	pc, err := NewPersistentCollection(readPath, nil, defaultKey, "")
+	pc, err := NewPersistentCollection(readPath, false, defaultKey, "")
 	assert.NoError(t, err)
 	for i := 0; i < 2; i++ {
 
@@ -79,7 +79,7 @@ func TestPersistentCollectionCloseReader(t *testing.T) {
 	filePathToBeDeleted := fd.Name()
 
 	// Load file to reader
-	pc, err := NewPersistentCollection(filePathToBeDeleted, nil, defaultKey, "")
+	pc, err := NewPersistentCollection(filePathToBeDeleted, false, defaultKey, "")
 	assert.NoError(t, err)
 	// Check file exists
 	_, err = os.Stat(filePathToBeDeleted)
