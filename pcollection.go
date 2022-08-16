@@ -65,8 +65,8 @@ func (p *PersistentCollection) SetBufferSize(newBufferSize int) {
 	p.MaxBufferSize = newBufferSize
 }
 
-func (p *PersistentCollection) Add() {
-
+func (p *PersistentCollection) Add(recordOutput any) {
+	p.PersistentWriter.Write(recordOutput)
 }
 
 func (p *PersistentCollection) Next(recordOutput any) error {
@@ -92,6 +92,19 @@ func (p *PersistentCollection) ResetReader() {
 	p.PersistentReader.Reset()
 }
 
-func (p *PersistentCollection) CloseReader() error {
+func (p *PersistentCollection) closeReader() error {
 	return p.PersistentReader.Close()
+}
+
+func (p *PersistentCollection) closeWriter() error {
+	return p.PersistentWriter.Close()
+}
+
+func (p *PersistentCollection) Close() error {
+	err := p.closeReader()
+	if err == nil {
+		return err
+	}
+	err = p.closeWriter()
+	return err
 }
