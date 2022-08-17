@@ -60,16 +60,16 @@ func writeTestRecords(t *testing.T, pw *PersistentWriter) {
 		go func(start, end int) {
 			defer sendersWaiter.Done()
 			for j := start; j < end; j++ {
-				pw.Write(records[j])
+				pw.write(records[j])
 			}
 		}(i, i+3)
 	}
 	sendersWaiter.Wait()
-	assert.NoError(t, pw.Close())
+	assert.NoError(t, pw.close())
 }
 
 func TestPersistentWriter(t *testing.T) {
-	writer, err := NewPersistentWriter("arr", true, 50000)
+	writer, err := newPersistentWriter("arr", true, 50000)
 	assert.NoError(t, err)
 	writeTestRecords(t, writer)
 	of, err := os.Open(writer.GetFilePath())
@@ -78,7 +78,7 @@ func TestPersistentWriter(t *testing.T) {
 	var response Response
 	assert.NoError(t, json.Unmarshal(byteValue, &response))
 	assert.NoError(t, of.Close())
-	assert.NoError(t, writer.RemoveOutputFilePath())
+	assert.NoError(t, writer.removeOutputFilePath())
 	for i := range records {
 		assert.Contains(t, response.Arr, records[i], "record %s missing", records[i].StrKey)
 	}

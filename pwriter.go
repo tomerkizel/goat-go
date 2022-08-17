@@ -16,63 +16,63 @@ const (
 )
 
 type PersistentWriter struct {
-	Empty        bool           `json:"empty"`
-	CompleteFile bool           `json:"completeFile"`
-	OutputFile   *os.File       `json:"outputFile"`
-	DataChan     chan any       `json:"dataChan"`
-	ErrorsQueue  *ErrorsQueue   `json:"errorsQueue"`
-	Once         *sync.Once     `json:"once"`
-	JsonKey      string         `json:"jsonKey"`
-	RunWait      sync.WaitGroup `json:"runWait"`
+	empty        bool
+	completeFile bool
+	outputFile   *os.File
+	dataChan     chan any
+	errorsQueue  *ErrorsQueue
+	once         *sync.Once
+	jsonKey      string
+	runWait      sync.WaitGroup
 }
 
-func NewPersistentWriter(jsonkey string, iscompletefile bool, maxbuffersize int) (*PersistentWriter, error) {
+func newPersistentWriter(jsonkey string, iscompletefile bool, maxbuffersize int) (*PersistentWriter, error) {
 	self := PersistentWriter{}
-	self.CompleteFile = iscompletefile
-	self.Empty = true
-	self.DataChan = make(chan any, maxbuffersize)
-	self.Once = new(sync.Once)
-	self.ErrorsQueue = NewErrorsQueue(maxbuffersize)
-	self.JsonKey = jsonkey
+	self.completeFile = iscompletefile
+	self.empty = true
+	self.dataChan = make(chan any, maxbuffersize)
+	self.once = new(sync.Once)
+	self.errorsQueue = NewErrorsQueue(maxbuffersize)
+	self.jsonKey = jsonkey
 	return &self, nil
 }
 
 func (pw *PersistentWriter) IsEmpty() bool {
-	return pw.Empty
+	return pw.empty
 }
 
 func (pw *PersistentWriter) IsCompleteFile() bool {
-	return pw.CompleteFile
+	return pw.completeFile
 }
 
 func (pw *PersistentWriter) GetFilePath() string {
-	if pw.OutputFile != nil {
-		return pw.OutputFile.Name()
+	if pw.outputFile != nil {
+		return pw.outputFile.Name()
 	}
 	return ""
 }
 
 func (pw *PersistentWriter) GetJsonKey() string {
-	return pw.JsonKey
+	return pw.jsonKey
 }
 
-func (pw *PersistentWriter) Write(record any) {
-	pw.Empty = false
+func (pw *PersistentWriter) write(record any) {
+	pw.empty = false
 	pw.startWritingWorker()
-	pw.DataChan <- record
+	pw.dataChan <- record
 }
 
 func (pw *PersistentWriter) startWritingWorker() {
-	pw.Once.Do(func() {
+	pw.once.Do(func() {
 		var err error
-		pw.OutputFile, err = utils.CreateTempFile()
+		pw.outputFile, err = utils.CreateTempFile()
 		if err != nil {
-			pw.ErrorsQueue.Add(err)
+			pw.errorsQueue.Add(err)
 			return
 		}
-		pw.RunWait.Add(1)
+		pw.runWait.Add(1)
 		go func() {
-			defer pw.RunWait.Done()
+			defer pw.runWait.Done()
 			pw.run()
 		}()
 	})
@@ -81,9 +81,9 @@ func (pw *PersistentWriter) startWritingWorker() {
 func (pw *PersistentWriter) run() {
 	var err error
 	defer func() {
-		err = pw.OutputFile.Close()
+		err = pw.outputFile.Close()
 		if err != nil {
-			pw.ErrorsQueue.Add(err)
+			pw.errorsQueue.Add(err)
 		}
 	}()
 	openString := jsonArrayPrefixPattern
@@ -91,9 +91,9 @@ func (pw *PersistentWriter) run() {
 	if pw.IsCompleteFile() {
 		openString = "{\n" + openString
 	}
-	_, err = pw.OutputFile.WriteString(fmt.Sprintf(openString, pw.GetJsonKey()))
+	_, err = pw.outputFile.WriteString(fmt.Sprintf(openString, pw.GetJsonKey()))
 	if err != nil {
-		pw.ErrorsQueue.Add(err)
+		pw.errorsQueue.Add(err)
 		return
 	}
 	buf := bytes.NewBuffer(nil)
@@ -101,17 +101,17 @@ func (pw *PersistentWriter) run() {
 	enc.SetIndent("    ", "  ")
 	recordPrefix := "\n    "
 	firstRecord := true
-	for record := range pw.DataChan {
+	for record := range pw.dataChan {
 		buf.Reset()
 		err = enc.Encode(record)
 		if err != nil {
-			pw.ErrorsQueue.Add(err)
+			pw.errorsQueue.Add(err)
 			continue
 		}
 		record := recordPrefix + string(bytes.TrimRight(buf.Bytes(), "\n"))
-		_, err = pw.OutputFile.WriteString(record)
+		_, err = pw.outputFile.WriteString(record)
 		if err != nil {
-			pw.ErrorsQueue.Add(err)
+			pw.errorsQueue.Add(err)
 			continue
 		}
 		if firstRecord {
@@ -126,29 +126,29 @@ func (pw *PersistentWriter) run() {
 	if pw.IsCompleteFile() {
 		closeString += "}\n"
 	}
-	_, err = pw.OutputFile.WriteString(closeString)
+	_, err = pw.outputFile.WriteString(closeString)
 	if err != nil {
-		pw.ErrorsQueue.Add(err)
+		pw.errorsQueue.Add(err)
 	}
 }
 
-func (pw *PersistentWriter) Close() error {
+func (pw *PersistentWriter) getError() error {
+	return pw.errorsQueue.Get()
+}
+
+func (pw *PersistentWriter) removeOutputFilePath() error {
+	return os.Remove(pw.outputFile.Name())
+}
+
+func (pw *PersistentWriter) close() error {
 	if pw.IsEmpty() {
 		return nil
 	}
-	close(pw.DataChan)
-	pw.RunWait.Wait()
-	if err := pw.GetError(); err != nil {
-		pw.ErrorsQueue.Add(err)
+	close(pw.dataChan)
+	pw.runWait.Wait()
+	if err := pw.getError(); err != nil {
+		pw.errorsQueue.Add(err)
 		return err
 	}
 	return nil
-}
-
-func (pw *PersistentWriter) GetError() error {
-	return pw.ErrorsQueue.Get()
-}
-
-func (pw *PersistentWriter) RemoveOutputFilePath() error {
-	return os.Remove(pw.OutputFile.Name())
 }

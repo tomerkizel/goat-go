@@ -1,39 +1,39 @@
 package goat
 
 type PersistentCollection struct {
-	MaxBufferSize    int               `json:"maxBufferSize"`
-	PersistentReader *PersistentReader `json:"persistentReader"`
-	PersistentWriter *PersistentWriter `json:"persistentWriter"`
+	MaxBufferSize    int `json:"maxBufferSize"`
+	persistentReader *PersistentReader
+	persistentWriter *PersistentWriter
 }
 
 func NewPersistentCollection(readfilepath string, writefullfile bool, readkey, writekey string) (*PersistentCollection, error) {
-	self := NewEmptyPersistentCollection()
-	err := self.SetReader(readkey, readfilepath)
+	self := newEmptyPersistentCollection()
+	err := self.setReader(readkey, readfilepath)
 	if err != nil {
 		return nil, err
 	}
-	err = self.SetWriter(writekey, writefullfile)
+	err = self.setWriter(writekey, writefullfile)
 	if err != nil {
 		return nil, err
 	}
 	return self, nil
 }
 
-func NewEmptyPersistentCollection() *PersistentCollection {
+func newEmptyPersistentCollection() *PersistentCollection {
 	self := PersistentCollection{}
 	self.MaxBufferSize = 50000
 	return &self
 }
 
-func (p *PersistentCollection) SetReader(readkey, filepath string) error {
+func (p *PersistentCollection) setReader(readkey, filepath string) error {
 	var err error
-	p.PersistentReader, err = NewPersistentReader(filepath, readkey, p.MaxBufferSize)
+	p.persistentReader, err = newPersistentReader(filepath, readkey, p.MaxBufferSize)
 	return err
 }
 
-func (p *PersistentCollection) SetWriter(jsonkey string, iscompletefile bool) error {
+func (p *PersistentCollection) setWriter(jsonkey string, iscompletefile bool) error {
 	var err error
-	p.PersistentWriter, err = NewPersistentWriter(jsonkey, iscompletefile, p.MaxBufferSize)
+	p.persistentWriter, err = newPersistentWriter(jsonkey, iscompletefile, p.MaxBufferSize)
 	return err
 }
 
@@ -44,60 +44,60 @@ func (p *PersistentCollection) GetBufferSize() int {
 	return p.MaxBufferSize
 }
 
-func (p *PersistentCollection) GetReaderError() error {
-	return p.PersistentReader.ErrorsQueue.Get()
-}
-
-func (p *PersistentCollection) GetWriterError() error {
-	return p.PersistentWriter.ErrorsQueue.Get()
-}
-
-func (p *PersistentCollection) GetReaderKey() string {
-	return p.PersistentReader.JsonKey
-}
-
-func (p *PersistentCollection) GetWriterKey() string {
-	return p.PersistentWriter.JsonKey
-}
-
 //setBufferSize sets the maxBufferSize to newSize
 func (p *PersistentCollection) SetBufferSize(newBufferSize int) {
 	p.MaxBufferSize = newBufferSize
 }
 
+func (p *PersistentCollection) GetReaderError() error {
+	return p.persistentReader.getError()
+}
+
+func (p *PersistentCollection) GetWriterError() error {
+	return p.persistentWriter.getError()
+}
+
+func (p *PersistentCollection) GetReaderKey() string {
+	return p.persistentReader.GetJsonKey()
+}
+
+func (p *PersistentCollection) GetWriterKey() string {
+	return p.persistentWriter.GetJsonKey()
+}
+
 func (p *PersistentCollection) Add(recordOutput any) {
-	p.PersistentWriter.Write(recordOutput)
+	p.persistentWriter.write(recordOutput)
 }
 
 func (p *PersistentCollection) Next(recordOutput any) error {
-	return p.PersistentReader.NextRecord(recordOutput)
+	return p.persistentReader.nextRecord(recordOutput)
 }
 
 func (p *PersistentCollection) ReaderLength() (int, error) {
-	if p.PersistentReader.Empty {
+	if p.persistentReader.IsEmpty() {
 		return 0, nil
 	}
-	if p.PersistentReader.Length == 0 {
+	if p.persistentReader.length == 0 {
 		for item := new(any); p.Next(item) == nil; item = new(any) {
 		}
-		p.PersistentReader.Reset()
+		p.persistentReader.reset()
 		if err := p.GetReaderError(); err != nil {
 			return 0, err
 		}
 	}
-	return p.PersistentReader.Length, nil
+	return p.persistentReader.length, nil
 }
 
 func (p *PersistentCollection) ResetReader() {
-	p.PersistentReader.Reset()
+	p.persistentReader.reset()
 }
 
 func closeReader(p *PersistentCollection) error {
-	return p.PersistentReader.Close()
+	return p.persistentReader.close()
 }
 
 func closeWriter(p *PersistentCollection) error {
-	return p.PersistentWriter.Close()
+	return p.persistentWriter.close()
 }
 
 func (p *PersistentCollection) Close() error {
