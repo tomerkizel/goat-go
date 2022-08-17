@@ -6,9 +6,9 @@
 :goat: Persistent Collection For The Go Language :goat:
 </h2>
 
-<h7 align="center"> This package was first written on <a href="https://github.com/jfrog/jfrog-client-go">JFrog client go</a></h3>
-
 ---
+
+<h7 align="center"> This package was first written on and extracted from <a href="https://github.com/jfrog/jfrog-client-go">JFrog client go</a></h3>
 
 ## Table of Contents
  - [Why Goat](#why-goat)
@@ -35,12 +35,16 @@ To initialize a new persistent collection, use the goat.NewPersistentCollection 
 pc, err := goat.NewPersistentCollection(readPath, false, "results", "")
 ```
 The parameters send to NewPersistentCollection are:
-```go
-readfilepath  string //The JSON file path from which the collection will read
-writefullfile bool   //Flag if the collection will write a full JSON file
-readkey       string //The key of the JSON object the collection will read - must be of type array
-writekey      string //The key of the JSON object the collection will write
-```
+| Name | Type | Info |
+| ------- | --- | --- |
+| readfilepath | string | The JSON file path from which the collection will read |
+| ------- | --- | --- |
+| writefullfile | bool | Flag if the collection will write a full JSON file |
+| ------- | --- | --- |
+| readkey | string | The key of the JSON object the collection will read - must be of type array |
+| ------- | --- | --- |
+| writekey | string | 28The key of the JSON object the collection will write3 |
+| ------- | --- | --- |
 
 After initializing a new persistent collection, you can read chunks from the file by using the Next method:
 ```go
