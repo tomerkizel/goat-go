@@ -14,8 +14,6 @@ This package was first written on and extracted from [JFrog client go](https://g
  - [Import Goat](#import-goat)
  - [Using Goat](#using-goat)
     - [PersistentCollection](#persistentcollection)
-    - [PersistentReader](#persistentreader)
-    - [PersistentWriter](#persistentwriter)
 
 ## Why Goat?
 Goat allows you to create a persistent collection, that reads and writes JSON files using small chunks of memory.
@@ -59,36 +57,5 @@ type PersistentCollection struct {
 	MaxBufferSize    int               `json:"maxBufferSize"`
 	PersistentReader *PersistentReader `json:"persistentReader"`
 	PersistentWriter *PersistentWriter `json:"persistentWriter"`
-}
-```
-
-### PersistentReader
-PersistentReader is used to read JSON files into small chunks of memory
-
-```go
-type PersistentReader struct {
-	Empty       bool                `json:"empty"`
-	Length      int                 `json:"length"`
-	FilePath    string              `json:"filePath"`
-	JsonKey     string              `json:"jsonKey"`
-	DataChan    chan map[string]any `json:"dataChan"`
-	ErrorsQueue *ErrorsQueue        `json:"errorsQueue"`
-	Once        *sync.Once          `json:"once"`
-}
-```
-
-### PersistentWriter
-PersistentWriter is used to write JSON files from small chunks of memory
-
-```go
-type PersistentWriter struct {
-	Empty        bool           `json:"empty"`
-	CompleteFile bool           `json:"completeFile"`
-	OutputFile   *os.File       `json:"outputFile"`
-	DataChan     chan any       `json:"dataChan"`
-	ErrorsQueue  *ErrorsQueue   `json:"errorsQueue"`
-	Once         *sync.Once     `json:"once"`
-	JsonKey      string         `json:"jsonKey"`
-	RunWait      sync.WaitGroup `json:"runWait"`
 }
 ```
