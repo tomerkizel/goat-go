@@ -10,7 +10,9 @@
 
 ---
 
-<h7 align="center"> This package was first written on and extracted from <a href="https://github.com/jfrog/jfrog-client-go">JFrog client go</a></h3>
+<div align="center">
+	This package was first written on and extracted from <a href="https://github.com/jfrog/jfrog-client-go">JFrog client go</a>
+</div>
 
 ## Table of Contents
  - [Why Goat](#why-goat)
