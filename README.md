@@ -46,12 +46,12 @@ writekey      string //The key of the JSON object the collection will write
 After initializing a new persistent collection, you can read chunks from the file by using the Next method:
 ```go
 pc, err := goat.NewPersistentCollection(readPath, false, "results", "")	
-var rSlice []inputRecord
+var output []inputRecord
 for item := new(inputRecord); pc.Next(item) == nil; item = new(inputRecord) {
-	rSlice = append(rSlice, *item)
+	output = append(rSlice, *item)
 }
 ```
-rSlice will include all the elements of the array read from the JSON located readPath in key "results"
+output will include all the elements of the array read from the JSON located readPath in key "results"
 
 ### PersistentCollection
 PersistentCollection is the main struct you'll be using while working with Goat.
