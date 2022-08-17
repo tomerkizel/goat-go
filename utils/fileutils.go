@@ -30,7 +30,7 @@ func CreateTempFile() (*os.File, error) {
 	return fd, err
 }
 
-func findDecoderTargetPosition(dec *json.Decoder, jsonkey string) error {
+func FindDecoderTargetPosition(dec *json.Decoder, jsonkey string) error {
 	for dec.More() {
 		// Token returns the next JSON token in the input stream.
 		t, err := dec.Token()
