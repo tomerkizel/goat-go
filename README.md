@@ -4,9 +4,7 @@
 
 <div align="center">
 
-:goat:
-# Persistent Collection For The Go Language
-:goat:
+# :goat:Persistent Collection For The Go Language:goat:
 
 </div>
 
