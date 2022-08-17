@@ -1,4 +1,4 @@
-package pcollection
+package goat
 
 type PersistentCollection struct {
 	MaxBufferSize    int               `json:"maxBufferSize"`
@@ -92,19 +92,19 @@ func (p *PersistentCollection) ResetReader() {
 	p.PersistentReader.Reset()
 }
 
-func (p *PersistentCollection) closeReader() error {
+func closeReader(p *PersistentCollection) error {
 	return p.PersistentReader.Close()
 }
 
-func (p *PersistentCollection) closeWriter() error {
+func closeWriter(p *PersistentCollection) error {
 	return p.PersistentWriter.Close()
 }
 
 func (p *PersistentCollection) Close() error {
-	err := p.closeReader()
+	err := closeReader(p)
 	if err == nil {
 		return err
 	}
-	err = p.closeWriter()
+	err = closeWriter(p)
 	return err
 }

@@ -1,4 +1,4 @@
-package pcollection
+package goat
 
 import (
 	"bufio"
@@ -8,6 +8,8 @@ import (
 	"io"
 	"os"
 	"sync"
+
+	"github.com/tomerkizel/goat-go/utils"
 )
 
 type PersistentReader struct {
@@ -78,7 +80,7 @@ func (pr *PersistentReader) readSingleFile() {
 	}()
 	br := bufio.NewReaderSize(fd, 65536) //65536 from original code, what does it mean?
 	dec := json.NewDecoder(br)
-	err = findDecoderTargetPosition(dec, pr.JsonKey)
+	err = utils.FindDecoderTargetPosition(dec, pr.JsonKey)
 	if err != nil {
 		if err == io.EOF {
 			pr.ErrorsQueue.Add(fmt.Errorf((pr.JsonKey + " not found")))
@@ -96,21 +98,6 @@ func (pr *PersistentReader) readSingleFile() {
 		}
 		pr.DataChan <- ResultItem
 	}
-}
-
-func findDecoderTargetPosition(dec *json.Decoder, jsonkey string) error {
-	for dec.More() {
-		// Token returns the next JSON token in the input stream.
-		t, err := dec.Token()
-		if err != nil {
-			return err
-		}
-		if t == jsonkey {
-			_, err = dec.Token()
-			return err
-		}
-	}
-	return nil
 }
 
 // Prepare the reader to read the file all over again (not thread-safe).

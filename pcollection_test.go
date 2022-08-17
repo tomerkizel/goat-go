@@ -1,4 +1,4 @@
-package pcollection
+package goat
 
 import (
 	"os"

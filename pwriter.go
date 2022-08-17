@@ -1,4 +1,4 @@
-package pcollection
+package goat
 
 import (
 	"bytes"
@@ -13,7 +13,6 @@ import (
 const (
 	jsonArrayPrefixPattern = "  \"%s\": ["
 	jsonArraySuffix        = "]\n"
-	DefaultKey             = "results"
 )
 
 type PersistentWriter struct {

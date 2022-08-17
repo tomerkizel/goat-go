@@ -1,4 +1,4 @@
-package pcollection
+package goat
 
 const MIN_SIZE int = 1
 
