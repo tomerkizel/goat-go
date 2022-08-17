@@ -39,7 +39,7 @@ The parameters send to NewPersistentCollection are:
 ```go
 readfilepath type string //The JSON file path from which the collection will read
 writefullfile type bool //Flag if the collection will write a full JSON file
-readkey type string //The key of the JSON object the collection will read (must be of type array)
+readkey type string //The key of the JSON object the collection will read - must be of type array
 writekey type string //The key of the JSON object the collection will write
 ```
 
