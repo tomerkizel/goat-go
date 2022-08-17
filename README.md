@@ -36,15 +36,11 @@ pc, err := goat.NewPersistentCollection(readPath, false, "results", "")
 ```
 The parameters send to NewPersistentCollection are:
 | Name | Type | Info |
-| ------- | --- | --- |
+| ---- | ---- | ---- |
 | readfilepath | string | The JSON file path from which the collection will read |
-| ------- | --- | --- |
 | writefullfile | bool | Flag if the collection will write a full JSON file |
-| ------- | --- | --- |
 | readkey | string | The key of the JSON object the collection will read - must be of type array |
-| ------- | --- | --- |
 | writekey | string | 28The key of the JSON object the collection will write3 |
-| ------- | --- | --- |
 
 After initializing a new persistent collection, you can read chunks from the file by using the Next method:
 ```go
