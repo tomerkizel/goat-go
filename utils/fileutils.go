@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -27,4 +28,19 @@ func CreateTempFile() (*os.File, error) {
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
 	fd, err := ioutil.TempFile(tempDirBase, tempPrefix+"-"+timestamp+"-")
 	return fd, err
+}
+
+func findDecoderTargetPosition(dec *json.Decoder, jsonkey string) error {
+	for dec.More() {
+		// Token returns the next JSON token in the input stream.
+		t, err := dec.Token()
+		if err != nil {
+			return err
+		}
+		if t == jsonkey {
+			_, err = dec.Token()
+			return err
+		}
+	}
+	return nil
 }
