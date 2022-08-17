@@ -1,10 +1,14 @@
-<h1 align="center">
+<dic align="center">
   <img src="./Goat-logo.png" alt="Goat" title="Goat" height="300px" />
-</h1>
+</div>
 
-<h2 align="center">
-:goat: Persistent Collection For The Go Language :goat:
-</h2>
+<div align="center">
+
+:goat:
+# Persistent Collection For The Go Language
+:goat:
+
+</div>
 
 ---
 
