@@ -34,7 +34,6 @@ To initialize a new persistent collection, use the goat.NewPersistentCollection 
 ```go
 pc, err := goat.NewPersistentCollection(readPath, false, "results", "")
 ```
-readfilepath string, writefullfile bool, readkey, writekey string
 The parameters send to NewPersistentCollection are:
 ```go
 readfilepath  string //The JSON file path from which the collection will read
