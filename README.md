@@ -5,13 +5,8 @@
 <div align="center">
 
 # :goat:Persistent Collection For The Go Language:goat:
+This package was first written on and extracted from [JFrog client go](https://github.com/jfrog/jfrog-client-go)
 
-</div>
-
----
-
-<div align="center">
-	This package was first written on and extracted from <a href="https://github.com/jfrog/jfrog-client-go">JFrog client go</a>
 </div>
 
 ## Table of Contents
