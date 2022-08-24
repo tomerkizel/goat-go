@@ -1,4 +1,4 @@
-<dic align="center">
+<div align="center">
   <img src="./Goat-logo.png" alt="Goat" title="Goat" height="300px" />
 </div>
 
