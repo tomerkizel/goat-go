@@ -6,12 +6,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAssignment(t *testing.T) {
+func TestPMapAssignment(t *testing.T) {
 	self := EmptyPMap(1, "hi")
-	new, e := self.Add(2, "Da")
+	new, e := self.AddOne(2, "Da")
 	assert.NoError(t, e)
 	assert.NotEqual(t, new.mapValue, self.mapValue)
-	fail, e := self.Add("yo", 1)
+	fail, e := self.AddOne("yo", 1)
 	assert.Error(t, e)
 	assert.Nil(t, fail)
 }
@@ -22,24 +22,53 @@ type TestStruct struct {
 	MapVar  map[string]any `json:"mapVar"`
 }
 
-func TestStructAssignment(t *testing.T) {
+func TestPMapStructAssignment(t *testing.T) {
 	self := EmptyPMap("", TestStruct{})
-	new, e := self.Add("test", TestStruct{1, true, make(map[string]any, 5)})
+	new, e := self.AddOne("test", TestStruct{1, true, make(map[string]any, 5)})
 	assert.NoError(t, e)
 	assert.NotEqual(t, self.mapValue, new.mapValue)
-	fail, e := new.Add("fail", 1)
+	fail, e := new.AddOne("fail", 1)
 	assert.Error(t, e)
 	assert.Nil(t, fail)
 }
 
-func TestReAssignment(t *testing.T) {
+func TestPMapReAssignment(t *testing.T) {
 	self := EmptyPMap(1, "")
-	new, e := self.Add(1, "aaa")
+	new, e := self.AddOne(1, "aaa")
 	assert.NoError(t, e)
 	assert.NotEqual(t, self.mapValue, new.mapValue)
 	assert.Equal(t, new.mapValue[1], "aaa")
-	newer, e := new.Add(1, "bbb")
+	newer, e := new.AddOne(1, "bbb")
 	assert.NoError(t, e)
 	assert.NotEqual(t, new.mapValue, newer.mapValue)
 	assert.Equal(t, newer.mapValue[1], "bbb")
+}
+
+func TestPMapRead(t *testing.T) {
+	arr := [4]string{"a", "b", "c", "d"}
+	mapval := map[any]any{1: "a", 2: "b", 3: "c", 4: "d"}
+	self := EmptyPMap(1, "")
+	self, e := self.AddBatch(mapval)
+	assert.NoError(t, e)
+	for i := 1; i <= 4; i++ {
+		val, e := self.Read(i)
+		assert.NoError(t, e)
+		assert.Equal(t, val, arr[i-1])
+	}
+	val, e := self.Read("1")
+	assert.Error(t, e)
+	assert.Nil(t, val)
+}
+
+func TestPMapDelete(t *testing.T) {
+	mapval := map[any]any{1: "a", 2: "b", 3: "c", 4: "d"}
+	self := EmptyPMap(1, "")
+	self, e := self.AddBatch(mapval)
+	assert.NoError(t, e)
+	fail, e := self.Delete("ar")
+	assert.Error(t, e)
+	assert.Nil(t, fail)
+	suc, e := self.Delete(1)
+	assert.NoError(t, e)
+	assert.Nil(t, suc.mapValue[1])
 }
