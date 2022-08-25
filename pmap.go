@@ -19,6 +19,7 @@ func (p *PMap) Add(key, value any) (*PMap, error) {
 	pn := PMap{}
 	pn.typekey = p.typekey
 	pn.typevalue = p.typevalue
+	pn.mapValue = make(map[any]any)
 	err := utils.CheckType(key, pn.typekey)
 	if err != nil {
 		return nil, err
