@@ -5,7 +5,7 @@ import (
 	"reflect"
 )
 
-func checkType(a, b any) error {
+func CheckType(a, b any) error {
 	if reflect.TypeOf(a).Kind() != reflect.TypeOf(b).Kind() {
 		return fmt.Errorf("key of type %v should be of type %v", reflect.TypeOf(a).Kind(), reflect.TypeOf(b).Kind())
 	}
