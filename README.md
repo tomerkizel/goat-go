@@ -4,8 +4,7 @@
 
 <div align="center">
 
-# :goat:Persistent Collection For The Go Language:goat:
-This package was first written on and extracted from [JFrog client go](https://github.com/jfrog/jfrog-client-go)
+# :goat:Persistent Data Structures For The Go Language:goat:
 
 </div>
 
@@ -13,11 +12,15 @@ This package was first written on and extracted from [JFrog client go](https://g
  - [Why Goat](#why-goat)
  - [Import Goat](#import-goat)
  - [Using Goat](#using-goat)
-    - [PersistentCollection](#persistentcollection)
+    - [PMap](#pmap)
 
 ## Why Goat?
-Goat allows you to create a persistent collection, that reads and writes JSON files using small chunks of memory.
-The default chunk size is 50000 but it can be change, see [Using Goat](#using-goat)
+Goat intoduces persistent data structures to Go.
+Currently available types:
+| Name | Implements | Section |
+| ---- | ---- | ---- |
+| PMap | Map | [PMap](#pmap) |
+| PArray | Array | [PArray](#parray) | 
 
 ## Import Goat
 
@@ -27,35 +30,19 @@ import github.com/tomerkizel/goat-go
 
 ## Using Goat
 
-To initialize a new persistent collection, use the goat.NewPersistentCollection function:
+### PMap
+
+PMap is goat's map type implementation.
+
+To initizalize a PMap, use:
+
 ```go
-pc, err := goat.NewPersistentCollection(readPath, false, "results", "")
+	self := goat.EmptyPMap(1, "")
 ```
-The parameters send to NewPersistentCollection are:
-| Name | Type | Info |
-| ---- | ---- | ---- |
-| readfilepath | string | The JSON file path from which the collection will read |
-| writefullfile | bool | Flag if the collection will write a full JSON file |
-| readkey | string | The key of the JSON object the collection will read - must be of type array |
-| writekey | string | 28The key of the JSON object the collection will write3 |
 
-After initializing a new persistent collection, you can read chunks from the file by using the Next method:
-```go
-pc, err := goat.NewPersistentCollection(readPath, false, "results", "")	
-var output []inputRecord
-for item := new(inputRecord); pc.Next(item) == nil; item = new(inputRecord) {
-	output = append(rSlice, *item)
-}
-```
-output will include all the elements of the array read from the JSON located readPath in key "results"
-
-### PersistentCollection
-PersistentCollection is the main struct you'll be using while working with Goat.
+In the above instance, 'self' will be a persistent map[int]string type
+To initizalize a persistent map[any]any type use:
 
 ```go
-type PersistentCollection struct {
-	MaxBufferSize    int               `json:"maxBufferSize"`
-	PersistentReader *PersistentReader `json:"persistentReader"`
-	PersistentWriter *PersistentWriter `json:"persistentWriter"`
-}
+	self := goat.EmptyPMap(nil, nil)
 ```
