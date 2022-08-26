@@ -16,6 +16,7 @@
 		- [AddOne and AddBatch](#addone-and-addbatch)
 		- [Read](#read)
 		- [Delete](#delete)
+- [PArray](#parray)
 
 # Why Goat?
 Goat intoduces persistent data structures to Go.
@@ -74,3 +75,18 @@ func (p *PMap) Delete(key any) (*PMap, error)
 
 Delete removes a specific key-value pair from the PMap.
 The method returns a new PMap with the change
+
+## PArray
+
+PArray is goat's array type implementation. To initizalize a PArray, use:
+
+```go
+self := EmptyPArray(1)
+```
+
+In the above instance, 'self' will be a persistent []int type.
+To initizalize a persistent []any type use:
+
+```go
+self := goat.EmptyPArray(nil)
+```
