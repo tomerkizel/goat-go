@@ -17,6 +17,10 @@
 		- [Read](#read)
 		- [Delete](#delete)
 - [PArray](#parray)
+	- [PArray Methods](#methods-1)
+		- [AddOne and AddBatch](#addone-and-addbatch-1)
+		- [Read](#read-1)
+		- [Delete](#delete-1)
 
 # Why Goat?
 Goat intoduces persistent data structures to Go.
