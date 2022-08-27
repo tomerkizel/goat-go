@@ -44,7 +44,7 @@ func TestPMapReAssignment(t *testing.T) {
 	assert.Equal(t, newer.mapValue[1], "bbb")
 }
 
-func TestPMapRead(t *testing.T) {
+func TestPMapReadDelete(t *testing.T) {
 	arr := [4]string{"a", "b", "c", "d"}
 	mapval := map[any]any{1: "a", 2: "b", 3: "c", 4: "d"}
 	self := EmptyPMap(1, "")
@@ -58,13 +58,6 @@ func TestPMapRead(t *testing.T) {
 	val, e := self.Read("1")
 	assert.Error(t, e)
 	assert.Nil(t, val)
-}
-
-func TestPMapDelete(t *testing.T) {
-	mapval := map[any]any{1: "a", 2: "b", 3: "c", 4: "d"}
-	self := EmptyPMap(1, "")
-	self, e := self.AddBatch(mapval)
-	assert.NoError(t, e)
 	fail, e := self.Delete("ar")
 	assert.Error(t, e)
 	assert.Nil(t, fail)

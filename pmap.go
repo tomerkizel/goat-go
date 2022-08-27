@@ -5,8 +5,8 @@ import (
 )
 
 type PMap struct {
-	typekey   any
-	typevalue any
+	keyType   any
+	valueType any
 	mapValue  map[any]any
 }
 
@@ -16,15 +16,12 @@ func EmptyPMap(keytype, valtype any) *PMap {
 }
 
 func (p *PMap) AddOne(key, value any) (*PMap, error) {
-	pn := PMap{}
-	pn.typekey = p.typekey
-	pn.typevalue = p.typevalue
-	pn.mapValue = make(map[any]any)
-	err := utils.CheckType(key, pn.typekey)
+	pn := EmptyPMap(p.keyType, p.valueType)
+	err := utils.CheckType(key, pn.keyType)
 	if err != nil {
 		return nil, err
 	}
-	err = utils.CheckType(value, pn.typevalue)
+	err = utils.CheckType(value, pn.valueType)
 	if err != nil {
 		return nil, err
 	}
@@ -32,33 +29,30 @@ func (p *PMap) AddOne(key, value any) (*PMap, error) {
 		pn.mapValue[k] = v
 	}
 	pn.mapValue[key] = value
-	return &pn, nil
+	return pn, nil
 }
 func (p *PMap) AddBatch(keyvalue map[any]any) (*PMap, error) {
-	pn := PMap{}
-	pn.typekey = p.typekey
-	pn.typevalue = p.typevalue
-	pn.mapValue = make(map[any]any)
+	pn := EmptyPMap(p.keyType, p.valueType)
 	for k, v := range p.mapValue {
 		pn.mapValue[k] = v
 	}
 	for key, value := range keyvalue {
-		err := utils.CheckType(key, pn.typekey)
+		err := utils.CheckType(key, pn.keyType)
 		if err != nil {
 			return nil, err
 		}
-		err = utils.CheckType(value, pn.typevalue)
+		err = utils.CheckType(value, pn.valueType)
 		if err != nil {
 			return nil, err
 		}
 
 		pn.mapValue[key] = value
 	}
-	return &pn, nil
+	return pn, nil
 }
 
 func (p *PMap) Read(key any) (any, error) {
-	e := utils.CheckType(key, p.typekey)
+	e := utils.CheckType(key, p.keyType)
 	if e != nil {
 		return nil, e
 	}
@@ -66,19 +60,16 @@ func (p *PMap) Read(key any) (any, error) {
 }
 
 func (p *PMap) Delete(key any) (*PMap, error) {
-	e := utils.CheckType(key, p.typekey)
+	pn := EmptyPMap(p.keyType, p.valueType)
+	e := utils.CheckType(key, p.keyType)
 	if e != nil {
 		return nil, e
 	}
-	pn := PMap{}
-	pn.typekey = p.typekey
-	pn.typevalue = p.typevalue
-	pn.mapValue = make(map[any]any)
 	for k, v := range p.mapValue {
 		if k == key {
 			continue
 		}
 		pn.mapValue[k] = v
 	}
-	return &pn, nil
+	return pn, nil
 }

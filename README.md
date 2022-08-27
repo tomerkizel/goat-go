@@ -56,7 +56,7 @@ func (p *PMap) AddOne(key, value any) (*PMap, error)
 func (p *PMap) AddBatch(keyvalue map[any]any) (*PMap, error)
 ```
 
-AddOne adds a single key-value pair, and AddBatch adds a batch of key-value pairs to the persistent map. <b>key and value params must be of the right types.</b>
+AddOne adds a single key-value pair, and AddBatch adds a batch of key-value pairs to the persistent map. <b>Key and value params must be of the right types.</b>
 The methods returns a new PMap with the change/s
 
 ### Read
@@ -73,8 +73,7 @@ Read returns the value of a given key in the PMap. the method works exaclty like
 func (p *PMap) Delete(key any) (*PMap, error) 
 ```
 
-Delete removes a specific key-value pair from the PMap.
-The method returns a new PMap with the change
+Delete removes a specific key-value pair from the PMap. The method returns a new PMap with the change
 
 ## PArray
 
@@ -90,3 +89,31 @@ To initizalize a persistent []any type use:
 ```go
 self := goat.EmptyPArray(nil)
 ```
+
+## Methods
+
+### AddOne and AddBatch
+
+```go
+func (p *PArray) AddOne(elem any) (*PArray, error)
+func (p *PArray) AddBatch(elems []any) (*PArray, error)
+```
+
+AddOne adds a single element, and AddBatch adds a batch of elements to the persistent array. <b>Elements must by of the correct type.</b>
+The methods returns a new PArray with the change/s
+
+### Read
+
+```go
+func (p *PArray) Read(index int) (any, error)
+```
+
+Read returns the value of a given index in the PArray. the method works exaclty like trying to read a value of a regular map
+
+### Delete
+
+```go
+func (p *PArray) Delete(index int) (*PArray, error)
+```
+
+Delete removes a index from the PArray. The method returns a new PMap with the change
