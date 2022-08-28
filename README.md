@@ -19,7 +19,8 @@
 	- [PArray Examples](#examples-1)
 
 # Why Goat?
-Goat intoduces persistent data structures to Go.
+Goat intoduces persistent data structures to Go. Persistent data struct is a data structure that always preserves the previous version of itself when it is modified. Therefor, each modifing method returns a new instance of the data structure with the modifications while keeping the original instance unchanged.
+
 Currently available types:
 
 | Name | Implements | Section |
