@@ -8,43 +8,88 @@ import (
 
 func TestPArrayAssignment(t *testing.T) {
 	self := EmptyPArray(1)
-	new, e := self.AddOne(1)
+	new, e := self.Push(1)
 	assert.NoError(t, e)
 	assert.NotEqual(t, new.arrayValue, self.arrayValue)
 	assert.Equal(t, new.arrayValue[0], 1)
-	fail, e := self.AddOne("yo")
+	fail, e := self.Push("yo")
 	assert.Error(t, e)
 	assert.Nil(t, fail)
 	arr := []any{1, 2, 3, 4, 5}
-	newer, e := self.AddBatch(arr)
+	newer, e := self.PushMany(arr)
 	assert.NoError(t, e)
 	assert.Equal(t, newer.arrayValue, arr)
 }
 
 func TestPArrayStruct(t *testing.T) {
 	self := EmptyPArray(TestStruct{})
-	new, e := self.AddOne(TestStruct{1, true, make(map[string]any, 5)})
+	new, e := self.Push(TestStruct{1, true, make(map[string]any, 5)})
 	assert.NoError(t, e)
 	assert.NotEqual(t, self.arrayValue, new.arrayValue)
-	fail, e := new.AddOne(1)
+	fail, e := new.Push(1)
 	assert.Error(t, e)
 	assert.Nil(t, fail)
 }
 
-func TestPArrayReadDelete(t *testing.T) {
+func TestPArrayMethods(t *testing.T) {
 	self := EmptyPArray(1)
 	arr := []any{1, 2, 3, 4, 5}
-	new, e := self.AddBatch(arr)
+	new, e := self.PushMany(arr)
 	assert.NoError(t, e)
-	val, e := new.Read(2)
+	val, e := new.Get(2)
 	assert.Equal(t, val, 3)
 	assert.NoError(t, e)
-	_, e = new.Read(60)
+	_, e = new.Get(60)
 	assert.Error(t, e)
-	newer, e := new.Delete(1)
+	new_1, item, e := new.Delete(1)
 	assert.NoError(t, e)
-	assert.NotEqual(t, newer.arrayValue, new.arrayValue)
-	fail, e := newer.Delete(60)
+	assert.NotEqual(t, new.arrayValue, new_1.arrayValue)
+	assert.Equal(t, item, 2)
+	fail, item, e := new.Delete(60)
 	assert.Nil(t, fail)
+	assert.Nil(t, item)
 	assert.Error(t, e)
+	new_2, item, e := new.Pop()
+	assert.NoError(t, e)
+	assert.Equal(t, item, 5)
+	assert.NotEqual(t, new.arrayValue, new_2.arrayValue)
+	fail, none, e := EmptyPArray(1).Pop()
+	assert.Error(t, e)
+	assert.Nil(t, none)
+	assert.Nil(t, fail)
+	new_3, e := new.Set(1, 60)
+	assert.NoError(t, e)
+	assert.Equal(t, new_3.arrayValue, []any{1, 60, 3, 4, 5})
+	fail, e = new_3.Set(2, "hi")
+	assert.Error(t, e)
+	assert.Nil(t, fail)
+	fail, e = new_3.Set(60, 3)
+	assert.Error(t, e)
+	assert.Nil(t, fail)
+}
+
+func TestPArrayNil(t *testing.T) {
+	self := EmptyPArray(nil)
+	new, e := self.Push(1)
+	assert.NoError(t, e)
+	assert.Equal(t, new.arrayValue, []any{1})
+	new, e = new.Push("hi")
+	assert.NoError(t, e)
+	assert.Equal(t, new.arrayValue, []any{1, "hi"})
+}
+
+func TestPArraySort(t *testing.T) {
+	self := EmptyPArray(1)
+	self, e := self.PushMany([]any{4, 2, 1, 6, 3})
+	assert.NoError(t, e)
+	x := func(i, j any) bool {
+		item_x, ok := i.(int)
+		assert.Equal(t, ok, true)
+		item_y, ok := j.(int)
+		assert.Equal(t, ok, true)
+		return item_x < item_y
+	}
+	sorted, e := self.Sort(x)
+	assert.NoError(t, e)
+	assert.Equal(t, sorted.arrayValue, []any{1, 2, 3, 4, 6})
 }
