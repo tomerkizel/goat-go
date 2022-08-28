@@ -75,37 +75,55 @@ GetArray returns a copy of the array inside PArray
 ```go
 func (p *PArray) GetArray() []any
 ```
+Merge allows you to merge two same-types PArrays into a single PArray
+```go
 
+```
 ## Examples
-The blow code generates an empty integer PArray, then pushes the values 4, 2, 1, 6, 3 to it.
+The blow code generates an empty integer PArray, then, using PArray.Merge(..), the values of arr are being pushed into merger
 
-(<b>Note:</b> self.PushMany(..) is assigned to self, if this wasn't the case, self would remain empty)
+(<b>Note:</b> merger.Merge(..) is assigned to merger, if this wasn't the case, merger would remain empty)
 
 sorted will be a new PArray instance, sorted by x function.
 
 ```go
 self := EmptyPArray(1)
-self, e := self.PushMany([]any{4, 2, 1, 6, 3})
-if e != nil {
-	return
+arr := []any{1, 2, 3, 4, 5}
+merger := EmptyPArray(1)
+var wait sync.WaitGroup
+for _, v := range arr {
+	wait.Add(1)
+	go func(v any) {
+		defer wait.Done()
+		new, e := self.Push(v)
+		if e != nil {
+			return
+		}
+		merger, e = merger.Merge(new)
+		if e != nil {
+			return
+		}
+	}(v)
 }
+wait.Wait()
 x := func(i, j any) bool {
 	item_x, ok := i.(int)
 	if !ok {
-		return
+		return false
 	}
 	item_y, ok := j.(int)
 	if !ok {
-		return
+		return false
 	}
 	return item_x < item_y
 }
-sorted, e := self.Sort(x)
+sorted, e := merger.Sort(x)
 if e != nil {
 	return
 }
-for i := range sorted.GetArray() {
-	fmt.Print("%v ", i)
+val := sorted.GetArray()
+for _, v := range val {
+	fmt.Print("%v ", v)
 }
 ```
 The code output will be <i>1 2 3 4 6 </i>

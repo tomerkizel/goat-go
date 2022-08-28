@@ -29,16 +29,16 @@ func (p *PArray) Push(elem any) (*PArray, error) {
 	return pn, nil
 }
 
-func (p *PArray) PushMany(elems []any) (*PArray, error) {
+func (p *PArray) Merge(q *PArray) (*PArray, error) {
+	err := utils.CheckType(p.elemtype, q.elemtype)
+	if err != nil {
+		return nil, err
+	}
 	pn := EmptyPArray(p.elemtype)
-	pn.arrayValue = make([]any, len(p.arrayValue)+len(elems))
+	pn.arrayValue = make([]any, len(p.arrayValue)+len(q.arrayValue))
 	final := copy(pn.arrayValue, p.arrayValue)
-	for i := range elems {
-		err := utils.CheckType(elems[i], pn.elemtype)
-		if err != nil {
-			return nil, err
-		}
-		pn.arrayValue[final] = elems[i]
+	for _, v := range q.GetArray() {
+		pn.arrayValue[final] = v
 		final++
 	}
 	return pn, nil

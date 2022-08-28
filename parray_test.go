@@ -1,6 +1,7 @@
 package goat
 
 import (
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -16,9 +17,11 @@ func TestPArrayAssignment(t *testing.T) {
 	assert.Error(t, e)
 	assert.Nil(t, fail)
 	arr := []any{1, 2, 3, 4, 5}
-	newer, e := self.PushMany(arr)
-	assert.NoError(t, e)
-	assert.Equal(t, newer.arrayValue, arr)
+	for _, v := range arr {
+		self, e = self.Push(v)
+		assert.NoError(t, e)
+	}
+	assert.Equal(t, self.arrayValue, arr)
 }
 
 func TestPArrayStruct(t *testing.T) {
@@ -32,32 +35,30 @@ func TestPArrayStruct(t *testing.T) {
 }
 
 func TestPArrayMethods(t *testing.T) {
-	self := EmptyPArray(1)
 	arr := []any{1, 2, 3, 4, 5}
-	new, e := self.PushMany(arr)
+	self := EmptyPArray(1)
+	var e error
+	for _, v := range arr {
+		self, e = self.Push(v)
+		assert.NoError(t, e)
+	}
+	new_1, item, e := self.Delete(1)
 	assert.NoError(t, e)
-	val, e := new.Get(2)
-	assert.Equal(t, val, 3)
-	assert.NoError(t, e)
-	_, e = new.Get(60)
-	assert.Error(t, e)
-	new_1, item, e := new.Delete(1)
-	assert.NoError(t, e)
-	assert.NotEqual(t, new.arrayValue, new_1.arrayValue)
+	assert.NotEqual(t, self.arrayValue, new_1.arrayValue)
 	assert.Equal(t, item, 2)
-	fail, item, e := new.Delete(60)
+	fail, item, e := self.Delete(60)
 	assert.Nil(t, fail)
 	assert.Nil(t, item)
 	assert.Error(t, e)
-	new_2, item, e := new.Pop()
+	new_2, item, e := self.Pop()
 	assert.NoError(t, e)
 	assert.Equal(t, item, 5)
-	assert.NotEqual(t, new.arrayValue, new_2.arrayValue)
+	assert.NotEqual(t, self.arrayValue, new_2.arrayValue)
 	fail, none, e := EmptyPArray(1).Pop()
 	assert.Error(t, e)
 	assert.Nil(t, none)
 	assert.Nil(t, fail)
-	new_3, e := new.Set(1, 60)
+	new_3, e := self.Set(1, 60)
 	assert.NoError(t, e)
 	assert.Equal(t, new_3.arrayValue, []any{1, 60, 3, 4, 5})
 	fail, e = new_3.Set(2, "hi")
@@ -78,10 +79,22 @@ func TestPArrayNil(t *testing.T) {
 	assert.Equal(t, new.arrayValue, []any{1, "hi"})
 }
 
-func TestPArraySort(t *testing.T) {
+func TestPArrayMergeAndSort(t *testing.T) {
 	self := EmptyPArray(1)
-	self, e := self.PushMany([]any{4, 2, 1, 6, 3})
-	assert.NoError(t, e)
+	arr := []any{1, 2, 3, 4, 5}
+	merger := EmptyPArray(1)
+	var wait sync.WaitGroup
+	for _, v := range arr {
+		wait.Add(1)
+		go func(v any) {
+			defer wait.Done()
+			new, e := self.Push(v)
+			assert.NoError(t, e)
+			merger, e = merger.Merge(new)
+			assert.NoError(t, e)
+		}(v)
+	}
+	wait.Wait()
 	x := func(i, j any) bool {
 		item_x, ok := i.(int)
 		assert.Equal(t, ok, true)
@@ -89,7 +102,8 @@ func TestPArraySort(t *testing.T) {
 		assert.Equal(t, ok, true)
 		return item_x < item_y
 	}
-	sorted, e := self.Sort(x)
+	sorted, e := merger.Sort(x)
 	assert.NoError(t, e)
-	assert.Equal(t, sorted.arrayValue, []any{1, 2, 3, 4, 6})
+	val := sorted.GetArray()
+	assert.Equal(t, val, arr)
 }
