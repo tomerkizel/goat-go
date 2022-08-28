@@ -118,8 +118,7 @@ sorted, e := merger.Sort(x)
 if e != nil {
 	return
 }
-val := sorted.GetArray()
-for _, v := range val {
+for _, v := range sorted.GetArray() {
 	fmt.Print("%v ", v)
 }
 ```
