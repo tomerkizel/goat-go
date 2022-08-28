@@ -106,4 +106,21 @@ func TestPMapMerge(t *testing.T) {
 
 	}
 	assert.Equal(t, mapval, merger.GetMap())
+	m1, m2 := EmptyPMap(1, ""), EmptyPMap(1, "")
+	count := 0
+	for k, v := range mapval {
+		if count%2 == 0 {
+			m2, e = m2.Set(k, v)
+			assert.NoError(t, e)
+
+		} else {
+			m1, e = m1.Set(k, v)
+			assert.NoError(t, e)
+
+		}
+		count++
+	}
+	merger, e = m1.Merge(m2)
+	assert.Equal(t, merger.GetMap(), mapval)
+	assert.NoError(t, e)
 }
