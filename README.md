@@ -12,19 +12,16 @@
  - [Why Goat](#why-goat)
  - [Import Goat](#import-goat)
  - [PMap](#pmap)
-	- [PMap Methods](#methods)
-		- [AddOne and AddBatch](#addone-and-addbatch)
-		- [Read](#read)
-		- [Delete](#delete)
+	- [PMap Methods](#key-methods)
+	- [PMap Examples](#examples)
 - [PArray](#parray)
 	- [PArray Methods](#methods-1)
-		- [AddOne and AddBatch](#addone-and-addbatch-1)
-		- [Read](#read-1)
-		- [Delete](#delete-1)
+	- [PArray Examples](#examples-1)
 
 # Why Goat?
 Goat intoduces persistent data structures to Go.
 Currently available types:
+
 | Name | Implements | Section |
 | ---- | ---- | ---- |
 | PMap | Map | [PMap](#pmap) |
@@ -41,83 +38,75 @@ import github.com/tomerkizel/goat-go
 PMap is goat's map type implementation. To initizalize a PMap, use:
 
 ```go
-self := goat.EmptyPMap(1, "")
+self := goat.EmptyPMap(x, y)
 ```
+self will be a persistent map[typeof(x)]typeof(y) type. Pass nil, nil to generate a persistent map[any]any type.
 
-In the above instance, 'self' will be a persistent map[int]string type.
-To initizalize a persistent map[any]any type use:
-
+## Key Methods
+Delete removes a specific key-value pair from the PMap. The method returns a new PMap with the change, the removed value of the key and an error.
 ```go
-self := goat.EmptyPMap(nil, nil)
+func (p *PMap) Delete(key any) (*PMap, any, error)
 ```
 
-## Methods
-
-### AddOne and AddBatch
-
+Keys returns an array of the keys of the PMap
 ```go
-func (p *PMap) AddOne(key, value any) (*PMap, error)
-func (p *PMap) AddBatch(keyvalue map[any]any) (*PMap, error)
+func (p *PMap) Keys() []any
 ```
 
-AddOne adds a single key-value pair, and AddBatch adds a batch of key-value pairs to the persistent map. <b>Key and value params must be of the right types.</b>
-The methods returns a new PMap with the change/s
+## Examples
 
-### Read
 
-```go
-func (p *PMap) Read(key any) (any, error)
-```
-
-Read returns the value of a given key in the PMap. the method works exaclty like trying to read a value of a regular map
-
-### Delete
-
-```go
-func (p *PMap) Delete(key any) (*PMap, error) 
-```
-
-Delete removes a specific key-value pair from the PMap. The method returns a new PMap with the change
-
-## PArray
+# PArray
 
 PArray is goat's array type implementation. To initizalize a PArray, use:
 
 ```go
-self := EmptyPArray(1)
+self := goat.EmptyPArray(x)
+```
+self will be a persistent []typeof(x) type. Pass nil to generate a persistent []any type.
+
+
+## Key Methods
+Sort sorts the PArray with a given function
+```go
+func (p *PArray) Sort(fn func(x, y any) bool) (*PArray, error)
+```
+GetArray returns a copy of the array inside PArray
+```go
+func (p *PArray) GetArray() []any
 ```
 
-In the above instance, 'self' will be a persistent []int type.
-To initizalize a persistent []any type use:
+## Examples
+The blow code generates an empty integer PArray, then pushes the values 4, 2, 1, 6, 3 to it.
+
+(<b>Note:</b> self.PushMany(..) is assigned to self, if this wasn't the case, self would remain empty)
+
+sorted will be a new PArray instance, sorted by x function.
 
 ```go
-self := goat.EmptyPArray(nil)
+	self := EmptyPArray(1)
+	self, e := self.PushMany([]any{4, 2, 1, 6, 3})
+	if e != nil {
+		return
+	}
+	x := func(i, j any) bool {
+		item_x, ok := i.(int)
+		if !ok {
+			return
+		}
+		item_y, ok := j.(int)
+		if !ok {
+			return
+		}
+		return item_x < item_y
+	}
+	sorted, e := self.Sort(x)
+	if e != nil {
+		return
+	}
+
+	for i := range sorted.GetArray() {
+		fmt.Print("%v ", i)
+	}
 ```
-
-## Methods
-
-### AddOne and AddBatch
-
-```go
-func (p *PArray) AddOne(elem any) (*PArray, error)
-func (p *PArray) AddBatch(elems []any) (*PArray, error)
-```
-
-AddOne adds a single element, and AddBatch adds a batch of elements to the persistent array. <b>Elements must by of the correct type.</b>
-The methods returns a new PArray with the change/s
-
-### Read
-
-```go
-func (p *PArray) Read(index int) (any, error)
-```
-
-Read returns the value of a given index in the PArray. the method works exaclty like trying to read a value of a regular map
-
-### Delete
-
-```go
-func (p *PArray) Delete(index int) (*PArray, error)
-```
-
-Delete removes a index from the PArray. The method returns a new PMap with the change
+The code output will be <i>1 2 3 4 6 </i>
