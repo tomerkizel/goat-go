@@ -23,7 +23,7 @@ func (p *PArray) Push(elem any) (*PArray, error) {
 		return nil, e
 	}
 	pn := EmptyPArray(p.elemtype)
-	pn.arrayValue = make([]any, len(p.arrayValue)+1)
+	pn.arrayValue = make([]any, p.Length()+1)
 	final := copy(pn.arrayValue, p.arrayValue)
 	pn.arrayValue[final] = elem
 	return pn, nil
@@ -35,7 +35,7 @@ func (p *PArray) Merge(q *PArray) (*PArray, error) {
 		return nil, err
 	}
 	pn := EmptyPArray(p.elemtype)
-	pn.arrayValue = make([]any, len(p.arrayValue)+len(q.arrayValue))
+	pn.arrayValue = make([]any, p.Length()+q.Length())
 	final := copy(pn.arrayValue, p.arrayValue)
 	for _, v := range q.GetArray() {
 		pn.arrayValue[final] = v
@@ -45,33 +45,33 @@ func (p *PArray) Merge(q *PArray) (*PArray, error) {
 }
 
 func (p *PArray) Set(index int, elem any) (*PArray, error) {
-	if index < 0 || index > len(p.arrayValue) {
-		return nil, fmt.Errorf("index %v out of range for length %v", index, len(p.arrayValue))
+	if index < 0 || index > p.Length() {
+		return nil, fmt.Errorf("index %v out of range for length %v", index, p.Length())
 	}
 	e := utils.CheckType(elem, p.elemtype)
 	if e != nil {
 		return nil, e
 	}
 	pn := EmptyPArray(p.elemtype)
-	pn.arrayValue = make([]any, len(p.arrayValue))
+	pn.arrayValue = make([]any, p.Length())
 	copy(pn.arrayValue, p.arrayValue)
 	pn.arrayValue[index] = elem
 	return pn, nil
 }
 
 func (p *PArray) Get(index int) (any, error) {
-	if index > len(p.arrayValue) || index < 0 {
-		return nil, fmt.Errorf("index %v out of range for length %v", index, len(p.arrayValue))
+	if index > p.Length() || index < 0 {
+		return nil, fmt.Errorf("index %v out of range for length %v", index, p.Length())
 	}
 	return p.arrayValue[index], nil
 }
 
 func (p *PArray) Delete(index int) (*PArray, any, error) {
-	if index > len(p.arrayValue) {
-		return nil, nil, fmt.Errorf("index %v out of range for length %v", index, len(p.arrayValue))
+	if index > p.Length() {
+		return nil, nil, fmt.Errorf("index %v out of range for length %v", index, p.Length())
 	}
 	pn := EmptyPArray(p.elemtype)
-	pn.arrayValue = make([]any, len(p.arrayValue)-1)
+	pn.arrayValue = make([]any, p.Length()-1)
 	count := 0
 	for i := range p.arrayValue {
 		if i == index {
@@ -84,15 +84,15 @@ func (p *PArray) Delete(index int) (*PArray, any, error) {
 }
 
 func (p *PArray) Pop() (*PArray, any, error) {
-	if len(p.arrayValue) == 0 {
+	if p.Length() == 0 {
 		return nil, nil, fmt.Errorf("can't pop an empty array")
 	}
-	return p.Delete(len(p.arrayValue) - 1)
+	return p.Delete(p.Length() - 1)
 }
 
 func (p *PArray) Sort(fn func(x, y any) bool) (*PArray, error) {
 	pn := EmptyPArray(p.elemtype)
-	pn.arrayValue = make([]any, len(p.arrayValue))
+	pn.arrayValue = make([]any, p.Length())
 	copy(pn.arrayValue, p.arrayValue)
 	sort.Slice(pn.arrayValue, func(i, j int) bool {
 		return fn(pn.arrayValue[i], pn.arrayValue[j])
@@ -101,7 +101,11 @@ func (p *PArray) Sort(fn func(x, y any) bool) (*PArray, error) {
 }
 
 func (p *PArray) GetArray() []any {
-	pn := make([]any, len(p.arrayValue))
+	pn := make([]any, p.Length())
 	copy(pn, p.arrayValue)
 	return pn
+}
+
+func (p *PArray) Length() int {
+	return len(p.arrayValue)
 }
