@@ -84,28 +84,25 @@ The blow code generates an empty integer PArray, then, using PArray.Merge(..), t
 
 (<b>Note:</b> merger.Merge(..) is assigned to merger, if this wasn't the case, merger would remain empty)
 
-sorted will be a new PArray instance, sorted by x function.
-
+sorted will be a new PArray instance, sorted by x function. The code output will be <i>1 2 3 4 6 </i>
 ```go
 self := goat.EmptyPArray(1)
 arr := []any{1, 2, 3, 4, 5}
-merger := goat.EmptyPArray(1)
-var wait sync.WaitGroup
+ch := make(chan *PArray)
+var e error
 for _, v := range arr {
-	wait.Add(1)
 	go func(v any) {
-		defer wait.Done()
 		new, e := self.Push(v)
 		if e != nil {
 			return
 		}
-		merger, e = merger.Merge(new)
-		if e != nil {
-			return
-		}
+		ch <- new
 	}(v)
+	merger, e = merger.Merge(<-ch)
+	if e != nil {
+		return
+	}
 }
-wait.Wait()
 x := func(i, j any) bool {
 	item_x, ok := i.(int)
 	if !ok {
@@ -126,4 +123,3 @@ for _, v := range val {
 	fmt.Print("%v ", v)
 }
 ```
-The code output will be <i>1 2 3 4 6 </i>

@@ -1,7 +1,6 @@
 package goat
 
 import (
-	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -83,18 +82,19 @@ func TestPArrayMergeAndSort(t *testing.T) {
 	self := EmptyPArray(1)
 	arr := []any{1, 2, 3, 4, 5}
 	merger := EmptyPArray(1)
-	var wait sync.WaitGroup
+	ch := make(chan *PArray)
+	var e error
 	for _, v := range arr {
-		wait.Add(1)
 		go func(v any) {
-			defer wait.Done()
 			new, e := self.Push(v)
 			assert.NoError(t, e)
-			merger, e = merger.Merge(new)
-			assert.NoError(t, e)
+			ch <- new
+
 		}(v)
+		merger, e = merger.Merge(<-ch)
+		assert.NoError(t, e)
+
 	}
-	wait.Wait()
 	x := func(i, j any) bool {
 		item_x, ok := i.(int)
 		assert.Equal(t, ok, true)
