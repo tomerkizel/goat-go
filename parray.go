@@ -2,6 +2,7 @@ package goat
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/tomerkizel/goat-go/utils"
 )
@@ -12,26 +13,24 @@ type PArray struct {
 }
 
 func EmptyPArray(elemtype any) *PArray {
-	self := PArray{elemtype, make([]any, 0)}
+	self := PArray{elemtype, nil}
 	return &self
 }
 
-func (p *PArray) AddOne(elem any) (*PArray, error) {
+func (p *PArray) Push(elem any) (*PArray, error) {
 	e := utils.CheckType(elem, p.elemtype)
 	if e != nil {
 		return nil, e
 	}
-	pn := PArray{}
-	pn.elemtype = p.elemtype
+	pn := EmptyPArray(p.elemtype)
 	pn.arrayValue = make([]any, len(p.arrayValue)+1)
 	final := copy(pn.arrayValue, p.arrayValue)
 	pn.arrayValue[final] = elem
-	return &pn, nil
+	return pn, nil
 }
 
-func (p *PArray) AddBatch(elems []any) (*PArray, error) {
-	pn := PArray{}
-	pn.elemtype = p.elemtype
+func (p *PArray) PushMany(elems []any) (*PArray, error) {
+	pn := EmptyPArray(p.elemtype)
 	pn.arrayValue = make([]any, len(p.arrayValue)+len(elems))
 	final := copy(pn.arrayValue, p.arrayValue)
 	for i := range elems {
@@ -42,22 +41,36 @@ func (p *PArray) AddBatch(elems []any) (*PArray, error) {
 		pn.arrayValue[final] = elems[i]
 		final++
 	}
-	return &pn, nil
+	return pn, nil
 }
 
-func (p *PArray) Read(index int) (any, error) {
-	if index > len(p.arrayValue) {
+func (p *PArray) Set(index int, elem any) (*PArray, error) {
+	if index < 0 || index > len(p.arrayValue) {
+		return nil, fmt.Errorf("index %v out of range for length %v", index, len(p.arrayValue))
+	}
+	e := utils.CheckType(elem, p.elemtype)
+	if e != nil {
+		return nil, e
+	}
+	pn := EmptyPArray(p.elemtype)
+	pn.arrayValue = make([]any, len(p.arrayValue))
+	copy(pn.arrayValue, p.arrayValue)
+	pn.arrayValue[index] = elem
+	return pn, nil
+}
+
+func (p *PArray) Get(index int) (any, error) {
+	if index > len(p.arrayValue) || index < 0 {
 		return nil, fmt.Errorf("index %v out of range for length %v", index, len(p.arrayValue))
 	}
 	return p.arrayValue[index], nil
 }
 
-func (p *PArray) Delete(index int) (*PArray, error) {
+func (p *PArray) Delete(index int) (*PArray, any, error) {
 	if index > len(p.arrayValue) {
-		return nil, fmt.Errorf("index %v out of range for length %v", index, len(p.arrayValue))
+		return nil, nil, fmt.Errorf("index %v out of range for length %v", index, len(p.arrayValue))
 	}
-	pn := PArray{}
-	pn.elemtype = p.elemtype
+	pn := EmptyPArray(p.elemtype)
 	pn.arrayValue = make([]any, len(p.arrayValue)-1)
 	count := 0
 	for i := range p.arrayValue {
@@ -67,5 +80,22 @@ func (p *PArray) Delete(index int) (*PArray, error) {
 		pn.arrayValue[count] = p.arrayValue[i]
 		count++
 	}
-	return &pn, nil
+	return pn, p.arrayValue[index], nil
+}
+
+func (p *PArray) Pop() (*PArray, any, error) {
+	if len(p.arrayValue) == 0 {
+		return nil, nil, fmt.Errorf("can't pop an empty array")
+	}
+	return p.Delete(len(p.arrayValue) - 1)
+}
+
+func (p *PArray) Sort(fn func(x, y any) bool) (*PArray, error) {
+	pn := EmptyPArray(p.elemtype)
+	pn.arrayValue = make([]any, len(p.arrayValue))
+	copy(pn.arrayValue, p.arrayValue)
+	sort.Slice(pn.arrayValue, func(i, j int) bool {
+		return fn(pn.arrayValue[i], pn.arrayValue[j])
+	})
+	return pn, nil
 }
