@@ -84,29 +84,28 @@ The blow code generates an empty integer PArray, then pushes the values 4, 2, 1,
 sorted will be a new PArray instance, sorted by x function.
 
 ```go
-	self := EmptyPArray(1)
-	self, e := self.PushMany([]any{4, 2, 1, 6, 3})
-	if e != nil {
+self := EmptyPArray(1)
+self, e := self.PushMany([]any{4, 2, 1, 6, 3})
+if e != nil {
+	return
+}
+x := func(i, j any) bool {
+	item_x, ok := i.(int)
+	if !ok {
 		return
 	}
-	x := func(i, j any) bool {
-		item_x, ok := i.(int)
-		if !ok {
-			return
-		}
-		item_y, ok := j.(int)
-		if !ok {
-			return
-		}
-		return item_x < item_y
-	}
-	sorted, e := self.Sort(x)
-	if e != nil {
+	item_y, ok := j.(int)
+	if !ok {
 		return
 	}
-
-	for i := range sorted.GetArray() {
-		fmt.Print("%v ", i)
-	}
+	return item_x < item_y
+}
+sorted, e := self.Sort(x)
+if e != nil {
+	return
+}
+for i := range sorted.GetArray() {
+	fmt.Print("%v ", i)
+}
 ```
 The code output will be <i>1 2 3 4 6 </i>
