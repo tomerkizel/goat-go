@@ -8,16 +8,6 @@
 
 </div>
 
-# Table of Contents
- - [Why Goat](#why-goat)
- - [Import Goat](#import-goat)
- - [PMap](#pmap)
-	- [PMap Methods](#key-methods)
-	- [PMap Examples](#examples)
-- [PArray](#parray)
-	- [PArray Methods](#methods-1)
-	- [PArray Examples](#examples-1)
-
 # Why Goat?
 Goat intoduces persistent data structures to Go. Persistent data struct is a data structure that always preserves the previous version of itself when it is modified. Therefor, each modifing method returns a new instance of the data structure with the modifications while keeping the original instance unchanged.
 
@@ -27,6 +17,15 @@ Currently available types:
 | ---- | ---- | ---- |
 | PMap | Map | [PMap](#pmap) |
 | PArray | Array | [PArray](#parray) | 
+
+# Table of Contents
+ - [Import Goat](#import-goat)
+ - [PMap](#pmap)
+	- [PMap Methods](#key-methods)
+	- [PMap Examples](#examples)
+- [PArray](#parray)
+	- [PArray Methods](#methods-1)
+	- [PArray Examples](#examples-1)
 
 # Import Goat
 
