@@ -99,3 +99,9 @@ func (p *PArray) Sort(fn func(x, y any) bool) (*PArray, error) {
 	})
 	return pn, nil
 }
+
+func (p *PArray) GetArray() []any {
+	pn := make([]any, len(p.arrayValue))
+	copy(pn, p.arrayValue)
+	return pn
+}
