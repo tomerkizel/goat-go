@@ -104,6 +104,5 @@ func TestPArrayMergeAndSort(t *testing.T) {
 	}
 	sorted, e := merger.Sort(x)
 	assert.NoError(t, e)
-	val := sorted.GetArray()
-	assert.Equal(t, val, arr)
+	assert.Equal(t, sorted.GetArray(), arr)
 }
