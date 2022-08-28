@@ -8,14 +8,13 @@ import (
 
 func TestPMapAssignment(t *testing.T) {
 	self := EmptyPMap(1, "hi")
-	new, e := self.SetOne(2, "Da")
+	new, e := self.Set(2, "Da")
 	assert.NoError(t, e)
-	assert.NotEqual(t, new.mapValue, self.mapValue)
-	fail, e := self.SetOne("yo", 1)
+	assert.NotEqual(t, new.GetMap(), self.GetMap())
+	fail, e := self.Set("yo", 1)
 	assert.Error(t, e)
 	assert.Nil(t, fail)
-	keys := new.Keys()
-	assert.Equal(t, keys, []any{2})
+	assert.Equal(t, new.Keys(), []any{2})
 }
 
 type TestStruct struct {
@@ -26,32 +25,41 @@ type TestStruct struct {
 
 func TestPMapStructAssignment(t *testing.T) {
 	self := EmptyPMap("", TestStruct{})
-	new, e := self.SetOne("test", TestStruct{1, true, make(map[string]any, 5)})
+	new, e := self.Set("test", TestStruct{1, true, make(map[string]any, 5)})
 	assert.NoError(t, e)
-	assert.NotEqual(t, self.mapValue, new.mapValue)
-	fail, e := new.SetOne("fail", 1)
+	assert.NotEqual(t, self.GetMap(), new.GetMap())
+	fail, e := new.Set("fail", 1)
 	assert.Error(t, e)
 	assert.Nil(t, fail)
 }
 
 func TestPMapReAssignment(t *testing.T) {
 	self := EmptyPMap(1, "")
-	new, e := self.SetOne(1, "aaa")
+	new, e := self.Set(1, "aaa")
 	assert.NoError(t, e)
-	assert.NotEqual(t, self.mapValue, new.mapValue)
+	assert.NotEqual(t, self.GetMap(), new.GetMap())
+	val, e := new.Get(1)
+	assert.NoError(t, e)
+	assert.Equal(t, val, "aaa")
 	assert.Equal(t, new.mapValue[1], "aaa")
-	newer, e := new.SetOne(1, "bbb")
+	newer, e := new.Set(1, "bbb")
 	assert.NoError(t, e)
-	assert.NotEqual(t, new.mapValue, newer.mapValue)
-	assert.Equal(t, newer.mapValue[1], "bbb")
+	assert.NotEqual(t, new.GetMap(), newer.GetMap())
+	val, e = newer.Get(1)
+	assert.NoError(t, e)
+	assert.Equal(t, val, "bbb")
 }
 
 func TestPMapMethods(t *testing.T) {
 	arr := [4]string{"a", "b", "c", "d"}
 	mapval := map[any]any{1: "a", 2: "b", 3: "c", 4: "d"}
 	self := EmptyPMap(1, "")
-	self, e := self.SetMany(mapval)
-	assert.NoError(t, e)
+	var e error
+	for k, v := range mapval {
+		self, e = self.Set(k, v)
+		assert.NoError(t, e)
+	}
+	assert.Equal(t, self.GetMap(), mapval)
 	for i := 1; i <= 4; i++ {
 		val, e := self.Get(i)
 		assert.NoError(t, e)
@@ -72,10 +80,30 @@ func TestPMapMethods(t *testing.T) {
 
 func TestPMapNil(t *testing.T) {
 	self := EmptyPMap(nil, nil)
-	new, e := self.SetOne(1, "hi")
+	new, e := self.Set(1, "hi")
 	assert.NoError(t, e)
 	assert.Equal(t, new.mapValue, map[any]any{1: "hi"})
-	new, e = new.SetOne("hello", 2)
+	new, e = new.Set("hello", 2)
 	assert.NoError(t, e)
 	assert.Equal(t, new.mapValue, map[any]any{1: "hi", "hello": 2})
+}
+
+func TestPMapMerge(t *testing.T) {
+	self := EmptyPMap(1, "")
+	mapval := map[any]any{1: "a", 2: "b", 3: "c", 4: "d", 5: "e"}
+	merger := EmptyPMap(1, "")
+	ch := make(chan *PMap)
+	var e error
+	for k, v := range mapval {
+		go func(v any) {
+			new, e := self.Set(k, v)
+			assert.NoError(t, e)
+			ch <- new
+
+		}(v)
+		merger, e = merger.Merge(<-ch)
+		assert.NoError(t, e)
+
+	}
+	assert.Equal(t, mapval, merger.GetMap())
 }

@@ -15,7 +15,7 @@ func EmptyPMap(keytype, valtype any) *PMap {
 	return &self
 }
 
-func (p *PMap) SetOne(key, value any) (*PMap, error) {
+func (p *PMap) Set(key, value any) (*PMap, error) {
 	pn := EmptyPMap(p.keyType, p.valueType)
 	err := utils.CheckType(key, pn.keyType)
 	if err != nil {
@@ -32,22 +32,21 @@ func (p *PMap) SetOne(key, value any) (*PMap, error) {
 	return pn, nil
 }
 
-func (p *PMap) SetMany(keyvalue map[any]any) (*PMap, error) {
+func (p *PMap) Merge(q *PMap) (*PMap, error) {
+	err := utils.CheckType(p.keyType, q.keyType)
+	if err != nil {
+		return nil, err
+	}
+	err = utils.CheckType(p.valueType, q.valueType)
+	if err != nil {
+		return nil, err
+	}
 	pn := EmptyPMap(p.keyType, p.valueType)
 	for k, v := range p.mapValue {
 		pn.mapValue[k] = v
 	}
-	for key, value := range keyvalue {
-		err := utils.CheckType(key, pn.keyType)
-		if err != nil {
-			return nil, err
-		}
-		err = utils.CheckType(value, pn.valueType)
-		if err != nil {
-			return nil, err
-		}
-
-		pn.mapValue[key] = value
+	for k, v := range q.mapValue {
+		pn.mapValue[k] = v
 	}
 	return pn, nil
 }
@@ -81,11 +80,23 @@ func (p *PMap) Delete(key any) (*PMap, any, error) {
 
 // Keys retuns an array of the keys of PMap
 func (p *PMap) Keys() []any {
-	keys := make([]any, len(p.mapValue))
+	keys := make([]any, p.Length())
 	i := 0
 	for k := range p.mapValue {
 		keys[i] = k
 		i++
 	}
 	return keys
+}
+
+func (p *PMap) GetMap() map[any]any {
+	pn := make(map[any]any)
+	for k, v := range p.mapValue {
+		pn[k] = v
+	}
+	return pn
+}
+
+func (p *PMap) Length() int {
+	return len(p.mapValue)
 }
