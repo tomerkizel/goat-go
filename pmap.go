@@ -15,7 +15,7 @@ func EmptyPMap(keytype, valtype any) *PMap {
 	return &self
 }
 
-func (p *PMap) AddOne(key, value any) (*PMap, error) {
+func (p *PMap) SetOne(key, value any) (*PMap, error) {
 	pn := EmptyPMap(p.keyType, p.valueType)
 	err := utils.CheckType(key, pn.keyType)
 	if err != nil {
@@ -31,7 +31,8 @@ func (p *PMap) AddOne(key, value any) (*PMap, error) {
 	pn.mapValue[key] = value
 	return pn, nil
 }
-func (p *PMap) AddBatch(keyvalue map[any]any) (*PMap, error) {
+
+func (p *PMap) SetMany(keyvalue map[any]any) (*PMap, error) {
 	pn := EmptyPMap(p.keyType, p.valueType)
 	for k, v := range p.mapValue {
 		pn.mapValue[k] = v
@@ -51,7 +52,7 @@ func (p *PMap) AddBatch(keyvalue map[any]any) (*PMap, error) {
 	return pn, nil
 }
 
-func (p *PMap) Read(key any) (any, error) {
+func (p *PMap) Get(key any) (any, error) {
 	e := utils.CheckType(key, p.keyType)
 	if e != nil {
 		return nil, e
@@ -59,17 +60,32 @@ func (p *PMap) Read(key any) (any, error) {
 	return p.mapValue[key], nil
 }
 
-func (p *PMap) Delete(key any) (*PMap, error) {
+// Delete removes the key-value pair identified by the key param.
+// Returns a new PMap and the value that got deleted
+func (p *PMap) Delete(key any) (*PMap, any, error) {
 	pn := EmptyPMap(p.keyType, p.valueType)
 	e := utils.CheckType(key, p.keyType)
 	if e != nil {
-		return nil, e
+		return nil, nil, e
 	}
+	var saved any
 	for k, v := range p.mapValue {
 		if k == key {
+			saved = v
 			continue
 		}
 		pn.mapValue[k] = v
 	}
-	return pn, nil
+	return pn, saved, nil
+}
+
+// Keys retuns an array of the keys of PMap
+func (p *PMap) Keys() []any {
+	keys := make([]any, len(p.mapValue))
+	i := 0
+	for k := range p.mapValue {
+		keys[i] = k
+		i++
+	}
+	return keys
 }
