@@ -20,14 +20,14 @@ func TestPArrayAssignment(t *testing.T) {
 		self, e = self.Push(v)
 		assert.NoError(t, e)
 	}
-	assert.Equal(t, self.arrayValue, arr)
+	assert.Equal(t, self.GetArray(), arr)
 }
 
 func TestPArrayStruct(t *testing.T) {
 	self := EmptyPArray(TestStruct{})
 	new, e := self.Push(TestStruct{1, true, make(map[string]any, 5)})
 	assert.NoError(t, e)
-	assert.NotEqual(t, self.arrayValue, new.arrayValue)
+	assert.NotEqual(t, self.GetArray(), new.GetArray())
 	fail, e := new.Push(1)
 	assert.Error(t, e)
 	assert.Nil(t, fail)
@@ -43,7 +43,7 @@ func TestPArrayMethods(t *testing.T) {
 	}
 	new_1, item, e := self.Delete(1)
 	assert.NoError(t, e)
-	assert.NotEqual(t, self.arrayValue, new_1.arrayValue)
+	assert.NotEqual(t, self.GetArray(), new_1.GetArray())
 	assert.Equal(t, item, 2)
 	fail, item, e := self.Delete(60)
 	assert.Nil(t, fail)
@@ -52,14 +52,14 @@ func TestPArrayMethods(t *testing.T) {
 	new_2, item, e := self.Pop()
 	assert.NoError(t, e)
 	assert.Equal(t, item, 5)
-	assert.NotEqual(t, self.arrayValue, new_2.arrayValue)
+	assert.NotEqual(t, self.GetArray(), new_2.GetArray())
 	fail, none, e := EmptyPArray(1).Pop()
 	assert.Error(t, e)
 	assert.Nil(t, none)
 	assert.Nil(t, fail)
 	new_3, e := self.Set(1, 60)
 	assert.NoError(t, e)
-	assert.Equal(t, new_3.arrayValue, []any{1, 60, 3, 4, 5})
+	assert.Equal(t, new_3.GetArray(), []any{1, 60, 3, 4, 5})
 	fail, e = new_3.Set(2, "hi")
 	assert.Error(t, e)
 	assert.Nil(t, fail)
@@ -72,10 +72,10 @@ func TestPArrayNil(t *testing.T) {
 	self := EmptyPArray(nil)
 	new, e := self.Push(1)
 	assert.NoError(t, e)
-	assert.Equal(t, new.arrayValue, []any{1})
+	assert.Equal(t, new.GetArray(), []any{1})
 	new, e = new.Push("hi")
 	assert.NoError(t, e)
-	assert.Equal(t, new.arrayValue, []any{1, "hi"})
+	assert.Equal(t, new.GetArray(), []any{1, "hi"})
 }
 
 func TestPArrayMergeAndSort(t *testing.T) {
