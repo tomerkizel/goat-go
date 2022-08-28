@@ -77,7 +77,7 @@ func (p *PArray) GetArray() []any
 ```
 Merge allows you to merge two same-types PArrays into a single PArray
 ```go
-
+func (p *PArray) Merge(q *PArray) (*PArray, error)
 ```
 ## Examples
 The blow code generates an empty integer PArray, then, using PArray.Merge(..), the values of arr are being pushed into merger
@@ -87,9 +87,9 @@ The blow code generates an empty integer PArray, then, using PArray.Merge(..), t
 sorted will be a new PArray instance, sorted by x function.
 
 ```go
-self := EmptyPArray(1)
+self := goat.EmptyPArray(1)
 arr := []any{1, 2, 3, 4, 5}
-merger := EmptyPArray(1)
+merger := goat.EmptyPArray(1)
 var wait sync.WaitGroup
 for _, v := range arr {
 	wait.Add(1)
