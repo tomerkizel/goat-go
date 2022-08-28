@@ -53,6 +53,11 @@ Keys returns an array of the keys of the PMap
 func (p *PMap) Keys() []any
 ```
 
+Merge allows you to merge two PMaps of the same key-value types into a single PMap
+```go
+func (p *PArray) Merge(q *PArray) (*PArray, error)
+```
+
 ## Examples
 
 
@@ -75,7 +80,7 @@ GetArray returns a copy of the array inside PArray
 ```go
 func (p *PArray) GetArray() []any
 ```
-Merge allows you to merge two same-types PArrays into a single PArray
+Merge allows you to merge two PArrays of the same type into a single PArray
 ```go
 func (p *PArray) Merge(q *PArray) (*PArray, error)
 ```
