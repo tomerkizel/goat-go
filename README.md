@@ -59,7 +59,7 @@ func (p *PArray) Merge(q *PArray) (*PArray, error)
 ```
 
 ## Examples
-
+Soon
 
 # PArray
 
